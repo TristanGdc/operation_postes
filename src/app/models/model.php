@@ -1,16 +1,24 @@
 <?php
 
+/** 
+ * This is a PHP model class to connect to database
+ * This class is used by all the other Model classes
+**/
+
 class Model extends PDO {
 
     private static $_instance;
 
-    //constructeur : héritage public obligatoire par héritage de PDO
     public function __construct() {
     }
 
-    //singleton
+    /** 
+     * Method to get 'Model' instance
+     * (Singleton design pattern)
+    **/
     public static function getInstance() {
-        //les variables sont définies dans le fichier config.php
+
+        //Database credentials are defined in config.php
         include 'controllers/config.php';
 
         if (!isset(self::$_instance)) {

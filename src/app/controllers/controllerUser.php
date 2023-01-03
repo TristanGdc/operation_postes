@@ -1,107 +1,174 @@
 <?php
+
+/** 
+ * This is a PHP controller class to handle user actions that concern authentication
+**/
+
 include 'config.php';
+
+//Import modelUser to access database methods that concern authentication
 require_once $root.'app/models/modelUser.php';
 
 class ControllerUser {
 
-    //inscription (formulaire)
-    public static function inscriptionForm($error = ''){
+    /** 
+     * Method to display register form
+     * 
+     * args : arguments passed by the router (including a potential error message)
+    **/
+    public static function registerForm($args){
         include 'config.php';
         if(!isset($_SESSION)) {session_start();}
-        if(!isset($_SESSION['PK_user_id'])){ //si non-connecté
-            $view = $root . 'app/views/authentification/viewRegisterForm.php'; //formulaire d'inscription
-            if(!$error == ''){
-                $_GET['reg_err'] = $error;
-            }
+
+        //Check if user isn't already logged in
+        if(!isset($_SESSION['PK_user_id'])){
+
+            //Register form location
+            $view = $root . 'app/views/authentication/viewRegisterForm.php';
             require($view);
-        }else{ //si déjà connecté
-            header('Location:router.php?action=accueil');
+
+        //If already logged in
+        }else{ 
+            header('Location:router.php?action=home');
         }
     }
 
-    //inscription (traitement du formulaire)
-    public static function inscription(){
+    //Method to register user (handle the register form content)
+    public static function register(){
         include 'config.php';
         if(!isset($_SESSION)) {session_start();}
-        if(!isset($_SESSION['PK_user_id'])){ //si non-connecté
-            if(isset($_POST['email']) && isset($_POST['password']) && isset($_POST['password_retype'])){ //si formulaire rempli
+
+        //Check if user isn't already logged in
+        if(!isset($_SESSION['PK_user_id'])){
+
+            //Check is the form is filled entirely
+            if(isset($_POST['email']) && isset($_POST['password']) && isset($_POST['password_retype'])){
                 $email = htmlspecialchars($_POST['email']);
                 $password = htmlspecialchars($_POST['password']);
                 $password_retype = htmlspecialchars($_POST['password_retype']);
-                if(!ModelUser::checkExists($email)){ //si le mail est disponible
-                    if(strlen($email) <= 50){ //si le mail est assez court
-                        if(filter_var($email, FILTER_VALIDATE_EMAIL)){ //si le format du mail est valide
-                            if($password == $password_retype){ //si les mots de passe correspondent
+
+                //Check if the email isn't already in the database
+                if(!ModelUser::checkExists($email)){
+
+                    //Check if the mail character length is <50
+                    if(strlen($email) <= 50){
+
+                        //Check if the mail format is valid
+                        if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+
+                            //Check if the passwords match
+                            if($password == $password_retype){
 
                                 ModelUser::insert($email, $password);
-                                header('Location:router.php?action=inscrit');
+                                header('Location:router.php?action=registered');
+                            
+                            //If the passwords don't match
+                            }else header('Location:router.php?action=registerForm&error=wrong-password-retype');
+                        
+                        //If the mail format isn't valid
+                        }else header('Location:router.php?action=registerForm&error=email-format');
 
-                            }else self::inscriptionForm('wrong-password-retype'); //si les mots de passe ne correspondent pas
-                        }else self::inscriptionForm('email-format'); //si le format du mail n'est pas valide
-                    }else self::inscriptionForm('long-email'); //si le mail est trop long
-                }else self::inscriptionForm('existing-email'); //si le mail est déjà utilisé
-            }else self::inscriptionForm('empty-field'); //si formulaire non-rempli
-        }else header('Location:router.php?action=accueil'); //si déjà connecté
+                    //If the mail is too long
+                    }else header('Location:router.php?action=registerForm&error=long-email');
+
+                //If the mail is already in use
+                }else header('Location:router.php?action=registerForm&error=existing-email');
+
+            //If the form isn't entirely filled
+            }else header('Location:router.php?action=registerForm&error=empty-field');
+
+        //If the user's already logged in
+        }else header('Location:router.php?action=home');
     }
 
-    //inscription (page de validation)
-    public static function inscrit(){
+    //Method to display the registration validation page
+    public static function registered(){
         include 'config.php';
         if(!isset($_SESSION)) {session_start();}
-        if(!isset($_SESSION['PK_user_id'])){ //si non-connecté
-            $view = $root . 'app/views/authentification/viewRegistered.php'; //écran de confirmation d'inscription
+
+        //Check if the user isn't already logged in
+        if(!isset($_SESSION['PK_user_id'])){
+
+            //Validation page location
+            $view = $root . 'app/views/authentication/viewRegistered.php';
             require($view);
-        }else{ //si déjà connecté
-            header('Location:router.php?action=accueil');
+
+        //If the user's already logged in
+        }else{
+            header('Location:router.php?action=home');
         }
     }
 
-    //connexion (fomulaire)
-    public static function connexionForm($error = ''){
+    /** 
+     * Method to display login form
+     * 
+     * args : arguments passed by the router (including a potential error message)
+    **/
+    public static function loginForm($args){
         include 'config.php';
         if(!isset($_SESSION)) {session_start();}
-        if(!isset($_SESSION['PK_user_id'])){ //si non-connecté
-            $view = $root . 'app/views/authentification/viewLoginForm.php'; //formulaire de connexion
-            if(!$error == ''){
-                $_GET['log_err'] = $error;
-            }
+
+        //Check if the user isn't already logged in
+        if(!isset($_SESSION['PK_user_id'])){
+
+            //Login form location
+            $view = $root . 'app/views/authentication/viewLoginForm.php';
             require($view);
-        }else{ //si déjà connecté
-            header('Location:router.php?action=accueil');
+
+        //If the user's already logged in
+        }else{
+            header('Location:router.php?action=home');
         }
     }
 
-    //connexion (traitement du formulaire)
-    public static function connexion(){
+    //Method to log user in (handle the login form content)
+    public static function login(){
         include 'config.php';
         if(!isset($_SESSION)) {session_start();}
-        if(!isset($_SESSION['PK_user_id'])){ //si non-connecté
-            if(isset($_POST['email']) && isset($_POST['password'])){ //si formulaire rempli
+
+        //Check if the user isn't already logged in
+        if(!isset($_SESSION['PK_user_id'])){
+
+            //Check is the form is filled entirely
+            if(isset($_POST['email']) && isset($_POST['password'])){
                 $email = htmlspecialchars($_POST['email']);
                 $password = htmlspecialchars($_POST['password']);
-                if(ModelUser::checkExists($email)){ //si l'utilisateur existe (email)
-                    $user = ModelUser::getUser($email);
-                    $password = hash('sha256', $password); //mot de passe rempli à la connexion
-                    $data_password = $user->getPassword(); //mot de passe de la bdd
-                    if($password === $data_password){ //si les mots de passe correspondent
-                    
-                        $_SESSION['PK_user_id'] = $user->getId(); //connexion
-                        header('Location:router.php?action=accueil'); //retour à l'accueil
 
-                    }else self::connexionForm('wrong-password'); //mauvais mot de passe
-                } else self::connexionForm('unknown-email'); //utilisateur non existant
-            }else self::connexionForm('empty-field'); //formulaire non rempli
-        }else header('Location:router.php?action=accueil'); //si déjà connecté
+                //Check if the given email is known from the database
+                if(ModelUser::checkExists($email)){
+                    $user = ModelUser::getUser($email);
+                    //Password given in the form
+                    $password = hash('sha256', $password);
+                    //Password from database
+                    $data_password = $user->getPassword();
+                    //Check if passwords match
+                    if($password === $data_password){
+                    
+                        $_SESSION['PK_user_id'] = $user->getId();
+                        header('Location:router.php?action=home');
+                    
+                    //If passwords don't match
+                    }else header('Location:router.php?action=loginForm&error=wrong-password');
+                
+                //If the email is unknown
+                } else header('Location:router.php?action=loginForm&error=unknown-email');
+
+            //If the form isn't entirely filled
+            }else header('Location:router.php?action=loginForm&error=empty-field');
+
+        //If the user's already logged in
+        }else header('Location:router.php?action=home');
     }
 
-    //deconnexion
-    public static function deconnexion(){
+    //Method to log user out
+    public static function logout(){
         include 'config.php';
-        if(!isset($_SESSION)) {
-            session_start();
-            session_destroy(); //déconnexion
-        }
-        header('Location:router.php?action=accueil');
+        if(!isset($_SESSION)) {session_start();}
+
+        //Logout
+        session_destroy();
+
+        header('Location:router.php?action=home');
     }
 }
 ?>

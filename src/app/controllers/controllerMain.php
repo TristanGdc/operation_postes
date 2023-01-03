@@ -1,12 +1,17 @@
 <?php
+
+/** 
+ * This is a PHP controller class to handle user general actions
+**/
+
 include 'config.php';
 
 class ControllerMain {
 
-    //accueil
-    public static function accueil(){
+    //Method to display homepage
+    public static function home(){
         include 'config.php';
-        $view = $root . 'app/views/accueil/viewHome.php';
+        $view = $root . 'app/views/home/viewHome.php';
         require($view);
     }
 }    

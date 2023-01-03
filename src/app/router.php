@@ -1,39 +1,44 @@
 <?php
+
+/** 
+ * This is a PHP router file to distribute user actions to the right controller
+**/
+
+//Import all controllers
 require ('controllers/controllerMain.php');
 require ('controllers/controllerUser.php');
 
-// --- récupération de l'action passée dans l'URL
+//Retrieve action in URL
 $query_string = $_SERVER['QUERY_STRING'];
 
-// fonction parse_str permet de construire 
-// une table de hachage (clé + valeur)
+//Create a hash table
 parse_str($query_string, $param);
 
-// --- $action contient le nom de la méthode statique recherchée
+//$action is the static method
 $action = htmlspecialchars($param["action"]);
 $action = $param['action'];
 
-// --- On supprime l'élément action de la structure
+//Remove action from the hash table
 unset($param['action']);
 
-// --- Tout ce qui reste sont des arguments
+//Everything remaming is the potential parameters
 $args = $param;
 
-// --- Liste des méthodes autorisées
+//Authorized methods list
 switch ($action) {
-    case "accueil" :
+    case "home" :
         ControllerMain::$action();
         break;
-    case "connexionForm" :
-    case "connexion" :
-    case "inscriptionForm" :
-    case "inscription" :
-    case "inscrit" :
-    case "deconnexion" :
-        ControllerUser::$action();
+    case "loginForm" :
+    case "login" :
+    case "registerForm" :
+    case "register" :
+    case "registered" :
+    case "logout" :
+        ControllerUser::$action($args);
         break;
     default:
-        $action = "accueil";
+        $action = "home";
         ControllerMain::$action();
 }
 ?>
