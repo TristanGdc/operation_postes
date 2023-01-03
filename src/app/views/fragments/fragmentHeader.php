@@ -1,3 +1,10 @@
+<?php 
+
+/** 
+ * This is a PHP fragment file containing the pages header
+**/
+?>
+
 <html>
     <head>
         <title>Opération postes</title>

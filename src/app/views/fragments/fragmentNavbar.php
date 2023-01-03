@@ -1,4 +1,11 @@
-  <nav class="navbar shadow navbar-expand-lg bg-body-tertiary sticky-top">
+<?php 
+
+/** 
+ * This is a PHP fragment file containing the pages navbar
+**/
+?>
+  
+<nav class="navbar shadow navbar-expand-lg bg-body-tertiary sticky-top">
   <div class="container-fluid">
 
     <!-- Opération postes navbar logo -->
