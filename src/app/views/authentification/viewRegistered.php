@@ -6,7 +6,7 @@
 
         <h1 class="mb-4"><b>Inscription réussie !</b></h1>
 
-        <h5>Retour à <a href="router.php?action=accueil">l'accueil</a>.</h5>
+        <h5>Retour à <a href="router.php?action=accueil">l'accueil</a> ou <a href="router.php?action=connexionForm">connexion</a>.</h5>
 
     </div>
 </body>
